@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.fitsupplepos.controller.ProductEditController"
+            fitToWidth="true" styleClass="root">
+
+    <VBox spacing="14" style="-fx-padding: 24;">
+        <Label fx:id="headerLabel" text="Add Product" styleClass="login-title"/>
+
+        <GridPane hgap="12" vgap="10">
+            <columnConstraints>
+                <ColumnConstraints percentWidth="50"/>
+                <ColumnConstraints percentWidth="50"/>
+            </columnConstraints>
+
+            <VBox spacing="4" GridPane.rowIndex="0" GridPane.columnIndex="0">
+                <Label text="Product Name *"/>
+                <TextField fx:id="nameField"/>
+            </VBox>
+            <VBox spacing="4" GridPane.rowIndex="0" GridPane.columnIndex="1">
+                <Label text="Brand"/>
+                <ComboBox fx:id="brandCombo" editable="true" maxWidth="Infinity"/>
+            </VBox>
+
+            <VBox spacing="4" GridPane.rowIndex="1" GridPane.columnIndex="0">
+                <Label text="Category *"/>
+                <ComboBox fx:id="categoryCombo" maxWidth="Infinity"/>
+            </VBox>
+            <VBox spacing="4" GridPane.rowIndex="1" GridPane.columnIndex="1">
+                <Label text="Sub Category"/>
+                <TextField fx:id="subCategoryField"/>
+            </VBox>
+
+            <VBox spacing="4" GridPane.rowIndex="2" GridPane.columnIndex="0">
+                <Label text="Flavour"/>
+                <TextField fx:id="flavourField"/>
+            </VBox>
+            <VBox spacing="4" GridPane.rowIndex="2" GridPane.columnIndex="1">
+                <Label text="Size"/>
+                <TextField fx:id="sizeField"/>
+            </VBox>
+
+            <VBox spacing="4" GridPane.rowIndex="3" GridPane.columnIndex="0">
+                <Label text="Unit (e.g. pcs, kg, bottle)"/>
+                <TextField fx:id="unitField"/>
+            </VBox>
+            <VBox spacing="4" GridPane.rowIndex="3" GridPane.columnIndex="1">
+                <Label text="SKU"/>
+                <TextField fx:id="skuField"/>
+            </VBox>
+
+            <VBox spacing="4" GridPane.rowIndex="4" GridPane.columnIndex="0">
+                <Label text="Barcode"/>
+                <TextField fx:id="barcodeField"/>
+            </VBox>
+            <VBox spacing="4" GridPane.rowIndex="4" GridPane.columnIndex="1">
+                <Label text="HSN Code"/>
+                <TextField fx:id="hsnField"/>
+            </VBox>
+
+            <VBox spacing="4" GridPane.rowIndex="5" GridPane.columnIndex="0">
+                <Label text="GST Rate (%)"/>
+                <TextField fx:id="gstRateField"/>
+            </VBox>
+            <VBox spacing="4" GridPane.rowIndex="5" GridPane.columnIndex="1">
+                <Label text="MRP *"/>
+                <TextField fx:id="mrpField"/>
+            </VBox>
+
+            <VBox spacing="4" GridPane.rowIndex="6" GridPane.columnIndex="0">
+                <Label text="Purchase Price *"/>
+                <TextField fx:id="purchasePriceField"/>
+            </VBox>
+            <VBox spacing="4" GridPane.rowIndex="6" GridPane.columnIndex="1">
+                <Label text="Selling Price *"/>
+                <TextField fx:id="sellingPriceField"/>
+            </VBox>
+
+            <VBox spacing="4" GridPane.rowIndex="7" GridPane.columnIndex="0">
+                <Label text="Minimum Stock"/>
+                <TextField fx:id="minimumStockField"/>
+            </VBox>
+            <VBox spacing="4" GridPane.rowIndex="7" GridPane.columnIndex="1">
+                <Label text="Active"/>
+                <CheckBox fx:id="activeCheckBox" selected="true"/>
+            </VBox>
+        </GridPane>
+
+        <Label fx:id="errorLabel" styleClass="error-text" wrapText="true" managed="false" visible="false"/>
+
+        <HBox spacing="10" alignment="CENTER_RIGHT">
+            <Button text="Cancel" styleClass="btn-secondary" onAction="#handleCancel"/>
+            <Button text="Save Product" styleClass="btn-primary" onAction="#handleSave"/>
+        </HBox>
+    </VBox>
+</ScrollPane>

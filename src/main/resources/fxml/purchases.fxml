@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.fitsupplepos.controller.PurchaseController"
+      spacing="16">
+
+    <Label text="Purchases" styleClass="placeholder-title"/>
+
+    <VBox styleClass="card" spacing="12">
+        <Label text="New Purchase" styleClass="card-title"/>
+
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Label text="Supplier *"/>
+            <ComboBox fx:id="supplierCombo" prefWidth="240"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="Overall Discount"/>
+            <TextField fx:id="overallDiscountField" prefWidth="100" text="0"/>
+        </HBox>
+
+        <GridPane hgap="10" vgap="8">
+            <columnConstraints>
+                <ColumnConstraints percentWidth="22"/>
+                <ColumnConstraints percentWidth="13"/>
+                <ColumnConstraints percentWidth="13"/>
+                <ColumnConstraints percentWidth="13"/>
+                <ColumnConstraints percentWidth="10"/>
+                <ColumnConstraints percentWidth="12"/>
+                <ColumnConstraints percentWidth="8"/>
+                <ColumnConstraints percentWidth="9"/>
+            </columnConstraints>
+
+            <Label text="Product *" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <Label text="Batch No." GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+            <Label text="Mfg Date" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+            <Label text="Expiry Date" GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+            <Label text="Qty *" GridPane.rowIndex="0" GridPane.columnIndex="4"/>
+            <Label text="Purchase Price *" GridPane.rowIndex="0" GridPane.columnIndex="5"/>
+            <Label text="GST %" GridPane.rowIndex="0" GridPane.columnIndex="6"/>
+            <Label text="" GridPane.rowIndex="0" GridPane.columnIndex="7"/>
+
+            <ComboBox fx:id="productCombo" editable="true" maxWidth="Infinity" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+            <TextField fx:id="batchNumberField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+            <DatePicker fx:id="mfgDatePicker" maxWidth="Infinity" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+            <DatePicker fx:id="expiryDatePicker" maxWidth="Infinity" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+            <TextField fx:id="qtyField" GridPane.rowIndex="1" GridPane.columnIndex="4"/>
+            <TextField fx:id="purchasePriceField" GridPane.rowIndex="1" GridPane.columnIndex="5"/>
+            <TextField fx:id="gstRateField" text="0" GridPane.rowIndex="1" GridPane.columnIndex="6"/>
+            <Button text="+ Add Line" styleClass="btn-secondary" onAction="#handleAddLine" GridPane.rowIndex="1" GridPane.columnIndex="7"/>
+        </GridPane>
+
+        <Label fx:id="errorLabel" styleClass="error-text" wrapText="true" managed="false" visible="false"/>
+    </VBox>
+
+    <TableView fx:id="lineTable" prefHeight="220">
+        <columns>
+            <TableColumn fx:id="lineProductCol" text="Product" prefWidth="220"/>
+            <TableColumn fx:id="lineBatchCol" text="Batch" prefWidth="100"/>
+            <TableColumn fx:id="lineExpiryCol" text="Expiry" prefWidth="100"/>
+            <TableColumn fx:id="lineQtyCol" text="Qty" prefWidth="70"/>
+            <TableColumn fx:id="linePriceCol" text="Price" prefWidth="90"/>
+            <TableColumn fx:id="lineGstCol" text="GST %" prefWidth="70"/>
+            <TableColumn fx:id="lineTotalCol" text="Line Total" prefWidth="100"/>
+            <TableColumn fx:id="lineRemoveCol" text="" prefWidth="80"/>
+        </columns>
+    </TableView>
+
+    <HBox spacing="16" alignment="CENTER_RIGHT">
+        <Label fx:id="grandTotalLabel" text="Grand Total: ₹0.00" styleClass="card-value"/>
+        <Button text="Save Purchase" styleClass="btn-primary" onAction="#handleSavePurchase"/>
+    </HBox>
+
+    <VBox styleClass="card" spacing="8">
+        <Label text="Recent Purchases" styleClass="card-title"/>
+        <TableView fx:id="purchaseHistoryTable" prefHeight="220">
+            <columns>
+                <TableColumn fx:id="histInvoiceCol" text="Invoice #" prefWidth="130"/>
+                <TableColumn fx:id="histDateCol" text="Date" prefWidth="140"/>
+                <TableColumn fx:id="histSupplierCol" text="Supplier" prefWidth="180"/>
+                <TableColumn fx:id="histTotalCol" text="Total" prefWidth="110"/>
+                <TableColumn fx:id="histStatusCol" text="Payment Status" prefWidth="130"/>
+            </columns>
+        </TableView>
+    </VBox>
+</VBox>

@@ -47,11 +47,11 @@ public class MainShellController {
     public void initialize() {
         modules.put("Dashboard", "/fxml/dashboard.fxml");
         modules.put("POS Billing", null);
-        modules.put("Products", null);
+        modules.put("Products", "/fxml/products.fxml");
         modules.put("Inventory", null);
-        modules.put("Purchases", null);
+        modules.put("Purchases", "/fxml/purchases.fxml");
         modules.put("Customers", null);
-        modules.put("Suppliers", null);
+        modules.put("Suppliers", "/fxml/suppliers.fxml");
         modules.put("GST / Non-GST", null);
         modules.put("Sales Returns", null);
         modules.put("Purchase Returns", null);
