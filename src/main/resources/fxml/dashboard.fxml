@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.ColumnConstraints?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.fitsupplepos.controller.DashboardController"
+      spacing="20">
+
+    <Label text="Dashboard" styleClass="placeholder-title"/>
+    <Label fx:id="dateLabel" styleClass="placeholder-text"/>
+
+    <GridPane hgap="16" vgap="16" fx:id="kpiGrid">
+        <columnConstraints>
+            <ColumnConstraints percentWidth="20"/>
+            <ColumnConstraints percentWidth="20"/>
+            <ColumnConstraints percentWidth="20"/>
+            <ColumnConstraints percentWidth="20"/>
+            <ColumnConstraints percentWidth="20"/>
+        </columnConstraints>
+
+        <VBox styleClass="card" spacing="6" GridPane.rowIndex="0" GridPane.columnIndex="0">
+            <Label text="TODAY'S SALES" styleClass="card-title"/>
+            <Label fx:id="todaySalesLabel" text="₹0.00" styleClass="card-value"/>
+        </VBox>
+        <VBox styleClass="card" spacing="6" GridPane.rowIndex="0" GridPane.columnIndex="1">
+            <Label text="TODAY'S PURCHASES" styleClass="card-title"/>
+            <Label fx:id="todayPurchasesLabel" text="₹0.00" styleClass="card-value"/>
+        </VBox>
+        <VBox styleClass="card" spacing="6" GridPane.rowIndex="0" GridPane.columnIndex="2">
+            <Label text="TODAY'S EXPENSES" styleClass="card-title"/>
+            <Label fx:id="todayExpensesLabel" text="₹0.00" styleClass="card-value card-value-danger"/>
+        </VBox>
+        <VBox styleClass="card" spacing="6" GridPane.rowIndex="0" GridPane.columnIndex="3">
+            <Label text="GROSS PROFIT" styleClass="card-title"/>
+            <Label fx:id="grossProfitLabel" text="₹0.00" styleClass="card-value card-value-success"/>
+        </VBox>
+        <VBox styleClass="card" spacing="6" GridPane.rowIndex="0" GridPane.columnIndex="4">
+            <Label text="NET PROFIT" styleClass="card-title"/>
+            <Label fx:id="netProfitLabel" text="₹0.00" styleClass="card-value card-value-success"/>
+        </VBox>
+
+        <VBox styleClass="card" spacing="6" GridPane.rowIndex="1" GridPane.columnIndex="0">
+            <Label text="TOTAL CUSTOMERS" styleClass="card-title"/>
+            <Label fx:id="totalCustomersLabel" text="0" styleClass="card-value"/>
+        </VBox>
+        <VBox styleClass="card" spacing="6" GridPane.rowIndex="1" GridPane.columnIndex="1">
+            <Label text="TOTAL PRODUCTS" styleClass="card-title"/>
+            <Label fx:id="totalProductsLabel" text="0" styleClass="card-value"/>
+        </VBox>
+        <VBox styleClass="card" spacing="6" GridPane.rowIndex="1" GridPane.columnIndex="2">
+            <Label text="LOW-STOCK PRODUCTS" styleClass="card-title"/>
+            <Label fx:id="lowStockLabel" text="0" styleClass="card-value card-value-orange"/>
+        </VBox>
+        <VBox styleClass="card" spacing="6" GridPane.rowIndex="1" GridPane.columnIndex="3">
+            <Label text="EXPIRING (30 DAYS)" styleClass="card-title"/>
+            <Label fx:id="expiringLabel" text="0" styleClass="card-value card-value-orange"/>
+        </VBox>
+        <VBox styleClass="card" spacing="6" GridPane.rowIndex="1" GridPane.columnIndex="4">
+            <Label text="TODAY'S INVOICES" styleClass="card-title"/>
+            <Label fx:id="todayInvoicesLabel" text="0" styleClass="card-value"/>
+        </VBox>
+    </GridPane>
+
+    <VBox styleClass="card" spacing="8">
+        <Label text="Charts" styleClass="card-title"/>
+        <Label text="Daily sales, monthly sales, top-selling products, and profit-trend charts will populate here once POS Billing (next build phase) starts recording sales." styleClass="placeholder-text" wrapText="true"/>
+    </VBox>
+</VBox>

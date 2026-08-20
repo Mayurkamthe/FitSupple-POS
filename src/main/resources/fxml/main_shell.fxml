@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.fitsupplepos.controller.MainShellController"
+            prefWidth="1280" prefHeight="800">
+
+    <top>
+        <HBox styleClass="app-header" alignment="CENTER_LEFT" spacing="16">
+            <Label text="FITSUPPLE POS" styleClass="title-text"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="statusLabel" text="● OFFLINE" styleClass="status-offline"/>
+            <Label fx:id="ownerLabel" text="OWNER" styleClass="owner-badge"/>
+            <Button text="Change Password" styleClass="btn-secondary" onAction="#handleChangePassword"/>
+            <Button text="Logout" styleClass="btn-accent" onAction="#handleLogout"/>
+        </HBox>
+    </top>
+
+    <left>
+        <ScrollPane fitToWidth="true" styleClass="sidebar" hbarPolicy="NEVER">
+            <VBox fx:id="sidebarBox" styleClass="sidebar"/>
+        </ScrollPane>
+    </left>
+
+    <center>
+        <ScrollPane fx:id="contentScroll" fitToWidth="true" fitToHeight="true" styleClass="content-area">
+            <VBox fx:id="contentArea" styleClass="content-area"/>
+        </ScrollPane>
+    </center>
+</BorderPane>
