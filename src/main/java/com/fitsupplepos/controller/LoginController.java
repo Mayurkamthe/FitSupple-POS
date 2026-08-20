@@ -72,6 +72,7 @@ public class LoginController {
         var css = getClass().getResource("/css/theme.css");
         if (css != null) scene.getStylesheets().add(css.toExternalForm());
         dialog.setScene(scene);
+        scene.setOnKeyPressed(ke -> { if (ke.getCode() == javafx.scene.input.KeyCode.ESCAPE) dialog.close(); });
         dialog.showAndWait();
 
         return controller.isSaved();

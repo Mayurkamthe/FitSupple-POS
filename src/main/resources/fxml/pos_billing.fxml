@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.fitsupplepos.controller.PosBillingController"
+      spacing="14">
+
+    <HBox spacing="12" alignment="CENTER_LEFT">
+        <Label text="POS Billing" styleClass="placeholder-title"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="billingModeLabel" styleClass="owner-badge"/>
+        <Button text="F1 New Bill" styleClass="btn-secondary" onAction="#handleNewBill"/>
+    </HBox>
+
+    <VBox styleClass="card" spacing="10">
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Label text="Barcode / Search (F2)" minWidth="160"/>
+            <TextField fx:id="barcodeField" promptText="Scan barcode or type product name, then Enter" prefWidth="320" onAction="#handleBarcodeEnter"/>
+            <ComboBox fx:id="productCombo" editable="true" prefWidth="260"/>
+            <Label text="Qty"/>
+            <TextField fx:id="qtyField" prefWidth="60" text="1"/>
+            <Label text="Discount ₹"/>
+            <TextField fx:id="discountField" prefWidth="80" text="0"/>
+            <Button text="Add to Cart" styleClass="btn-secondary" onAction="#handleAddToCart"/>
+        </HBox>
+
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Label text="Customer (F3)" minWidth="160"/>
+            <ComboBox fx:id="customerCombo" editable="true" prefWidth="260"/>
+            <Button text="Walk-in / Clear" styleClass="btn-secondary" onAction="#handleClearCustomer"/>
+        </HBox>
+
+        <Label fx:id="errorLabel" styleClass="error-text" wrapText="true" managed="false" visible="false"/>
+    </VBox>
+
+    <TableView fx:id="cartTable" VBox.vgrow="ALWAYS" prefHeight="300">
+        <columns>
+            <TableColumn fx:id="cartProductCol" text="Product" prefWidth="240"/>
+            <TableColumn fx:id="cartRateCol" text="Rate" prefWidth="90"/>
+            <TableColumn fx:id="cartQtyCol" text="Qty" prefWidth="60"/>
+            <TableColumn fx:id="cartDiscountCol" text="Discount" prefWidth="90"/>
+            <TableColumn fx:id="cartTotalCol" text="Est. Total" prefWidth="100"/>
+            <TableColumn fx:id="cartRemoveCol" text="" prefWidth="90"/>
+        </columns>
+    </TableView>
+
+    <GridPane hgap="20" styleClass="card">
+        <columnConstraints>
+            <ColumnConstraints percentWidth="55"/>
+            <ColumnConstraints percentWidth="45"/>
+        </columnConstraints>
+
+        <VBox spacing="10" GridPane.columnIndex="0">
+            <Label text="Payment Method (F4)"/>
+            <ComboBox fx:id="paymentMethodCombo" maxWidth="220"/>
+            <Label text="Amount Paid"/>
+            <TextField fx:id="amountPaidField" maxWidth="220"/>
+        </VBox>
+
+        <VBox spacing="6" GridPane.columnIndex="1" alignment="CENTER_RIGHT">
+            <Label fx:id="subtotalLabel" text="Subtotal: ₹0.00"/>
+            <Label fx:id="discountTotalLabel" text="Discount: ₹0.00"/>
+            <Label fx:id="taxableLabel" text="Taxable Amount: ₹0.00"/>
+            <Label fx:id="gstLabel" text="GST (CGST+SGST): ₹0.00"/>
+            <Label fx:id="grandTotalLabel" text="Grand Total: ₹0.00" styleClass="card-value"/>
+        </VBox>
+    </GridPane>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="F6 Print" styleClass="btn-secondary" onAction="#handlePrint"/>
+        <Button text="F7 WhatsApp Invoice" styleClass="btn-secondary" onAction="#handleWhatsApp"/>
+        <Button text="F5 Save Bill" styleClass="btn-accent" onAction="#handleSaveBill"/>
+    </HBox>
+</VBox>

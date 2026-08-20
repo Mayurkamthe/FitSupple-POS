@@ -46,11 +46,11 @@ public class MainShellController {
     @FXML
     public void initialize() {
         modules.put("Dashboard", "/fxml/dashboard.fxml");
-        modules.put("POS Billing", null);
+        modules.put("POS Billing", "/fxml/pos_billing.fxml");
         modules.put("Products", "/fxml/products.fxml");
         modules.put("Inventory", null);
         modules.put("Purchases", "/fxml/purchases.fxml");
-        modules.put("Customers", null);
+        modules.put("Customers", "/fxml/customers.fxml");
         modules.put("Suppliers", "/fxml/suppliers.fxml");
         modules.put("GST / Non-GST", null);
         modules.put("Sales Returns", null);
@@ -172,6 +172,7 @@ public class MainShellController {
                 var css = getClass().getResource("/css/theme.css");
                 if (css != null) scene.getStylesheets().add(css.toExternalForm());
                 dialog.setScene(scene);
+                scene.setOnKeyPressed(ke -> { if (ke.getCode() == javafx.scene.input.KeyCode.ESCAPE) dialog.close(); });
                 dialog.showAndWait();
 
                 if (controller.isSaved()) {

@@ -116,4 +116,9 @@ public class Sale {
         items.add(item);
         item.setSale(this);
     }
+
+    public void addPayment(Payment payment) {
+        payments.add(payment);
+        payment.setSale(this);
+    }
 }
