@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.fitsupplepos.controller.OfferController"
+      spacing="16">
+
+    <HBox spacing="12" alignment="CENTER_LEFT">
+        <Label text="Offers" styleClass="placeholder-title"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="+ Add Offer" styleClass="btn-primary" onAction="#handleAdd"/>
+    </HBox>
+
+    <TableView fx:id="offerTable" VBox.vgrow="ALWAYS" prefHeight="580">
+        <columns>
+            <TableColumn fx:id="nameCol" text="Name" prefWidth="180"/>
+            <TableColumn fx:id="typeCol" text="Type" prefWidth="150"/>
+            <TableColumn fx:id="targetCol" text="Applies To" prefWidth="200"/>
+            <TableColumn fx:id="valueCol" text="Value" prefWidth="120"/>
+            <TableColumn fx:id="periodCol" text="Valid Period" prefWidth="180"/>
+            <TableColumn fx:id="statusCol" text="Status" prefWidth="100"/>
+            <TableColumn fx:id="actionsCol" text="Actions" prefWidth="140"/>
+        </columns>
+    </TableView>
+</VBox>

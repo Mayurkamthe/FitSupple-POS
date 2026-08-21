@@ -52,11 +52,11 @@ public class MainShellController {
         modules.put("Purchases", "/fxml/purchases.fxml");
         modules.put("Customers", "/fxml/customers.fxml");
         modules.put("Suppliers", "/fxml/suppliers.fxml");
-        modules.put("GST / Non-GST", null);
+        modules.put("GST / Non-GST", "/fxml/gst_settings.fxml");
         modules.put("Sales Returns", "/fxml/sales_returns.fxml");
         modules.put("Purchase Returns", "/fxml/purchase_returns.fxml");
-        modules.put("Expenses", null);
-        modules.put("Offers", null);
+        modules.put("Expenses", "/fxml/expenses.fxml");
+        modules.put("Offers", "/fxml/offers.fxml");
         modules.put("WhatsApp", null);
         modules.put("Reports", null);
         modules.put("Backup & Restore", null);
