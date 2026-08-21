@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.fitsupplepos.controller.InventoryController"
+      spacing="16">
+
+    <HBox spacing="12" alignment="CENTER_LEFT">
+        <Label text="Inventory" styleClass="placeholder-title"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="valuationCostLabel" text="Stock value (cost): ₹0.00" styleClass="placeholder-text"/>
+        <Label fx:id="valuationMrpLabel" text="Stock value (MRP): ₹0.00" styleClass="placeholder-text"/>
+        <Button text="↻ Refresh" styleClass="btn-secondary" onAction="#handleRefresh"/>
+    </HBox>
+
+    <TabPane fx:id="tabPane" VBox.vgrow="ALWAYS" tabClosingPolicy="UNAVAILABLE">
+        <Tab text="All Stock">
+            <VBox spacing="8">
+                <TableView fx:id="allStockTable" prefHeight="520"/>
+            </VBox>
+        </Tab>
+        <Tab text="Low Stock">
+            <VBox spacing="8">
+                <TableView fx:id="lowStockTable" prefHeight="520"/>
+            </VBox>
+        </Tab>
+        <Tab text="Out of Stock">
+            <VBox spacing="8">
+                <TableView fx:id="outOfStockTable" prefHeight="520"/>
+            </VBox>
+        </Tab>
+        <Tab text="Expiring 30 Days">
+            <VBox spacing="8">
+                <TableView fx:id="expiring30Table" prefHeight="520"/>
+            </VBox>
+        </Tab>
+        <Tab text="Expiring 60 Days">
+            <VBox spacing="8">
+                <TableView fx:id="expiring60Table" prefHeight="520"/>
+            </VBox>
+        </Tab>
+        <Tab text="Expired">
+            <VBox spacing="8">
+                <TableView fx:id="expiredTable" prefHeight="520"/>
+            </VBox>
+        </Tab>
+    </TabPane>
+</VBox>

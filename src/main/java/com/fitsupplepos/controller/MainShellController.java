@@ -48,13 +48,13 @@ public class MainShellController {
         modules.put("Dashboard", "/fxml/dashboard.fxml");
         modules.put("POS Billing", "/fxml/pos_billing.fxml");
         modules.put("Products", "/fxml/products.fxml");
-        modules.put("Inventory", null);
+        modules.put("Inventory", "/fxml/inventory.fxml");
         modules.put("Purchases", "/fxml/purchases.fxml");
         modules.put("Customers", "/fxml/customers.fxml");
         modules.put("Suppliers", "/fxml/suppliers.fxml");
         modules.put("GST / Non-GST", null);
-        modules.put("Sales Returns", null);
-        modules.put("Purchase Returns", null);
+        modules.put("Sales Returns", "/fxml/sales_returns.fxml");
+        modules.put("Purchase Returns", "/fxml/purchase_returns.fxml");
         modules.put("Expenses", null);
         modules.put("Offers", null);
         modules.put("WhatsApp", null);

@@ -1,5 +1,7 @@
 package com.fitsupplepos.service;
 
+import com.fitsupplepos.config.SessionManager;
+import com.fitsupplepos.exception.BusinessException;
 import com.fitsupplepos.model.InventoryTransaction;
 import com.fitsupplepos.model.Product;
 import com.fitsupplepos.model.ProductBatch;
@@ -53,5 +55,40 @@ public class InventoryService {
         session.merge(batch);
         recordTransaction(session, type, batch.getProduct(), batch, quantity, previous, updated,
                 referenceInvoice, reason);
+    }
+
+    /**
+     * Standalone manual stock correction, used by the Inventory screen — opens and owns its
+     * own transaction (unlike increaseStock/decreaseStock above, which expect a session that's
+     * already inside a caller-owned transaction such as a Purchase or Sale).
+     *
+     * @param deltaQuantity positive to add stock (ADJUSTMENT only), negative to remove
+     *                      (ADJUSTMENT, DAMAGE, or EXPIRED write-off).
+     */
+    public void manualAdjust(Long batchId, int deltaQuantity, TransactionType type, String reason) {
+        if (type != TransactionType.ADJUSTMENT && type != TransactionType.DAMAGE && type != TransactionType.EXPIRED) {
+            throw new BusinessException("Unsupported adjustment type: " + type);
+        }
+        if (deltaQuantity == 0) {
+            throw new BusinessException("Adjustment quantity cannot be zero.");
+        }
+        if (deltaQuantity < 0 && type == TransactionType.ADJUSTMENT) {
+            // negative ADJUSTMENT is allowed (stock correction downward), no special handling needed
+        }
+        if (deltaQuantity > 0 && type != TransactionType.ADJUSTMENT) {
+            throw new BusinessException("Only ADJUSTMENT can increase stock; DAMAGE and EXPIRED always reduce stock.");
+        }
+
+        SessionManager.withTransactionVoid(session -> {
+            ProductBatch batch = session.get(ProductBatch.class, batchId);
+            if (batch == null) {
+                throw new BusinessException("Batch not found.");
+            }
+            if (deltaQuantity > 0) {
+                increaseStock(session, batch, deltaQuantity, type, null, reason);
+            } else {
+                decreaseStock(session, batch, Math.abs(deltaQuantity), type, null, reason);
+            }
+        });
     }
 }
