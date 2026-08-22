@@ -71,12 +71,18 @@ public class ProductController {
 
         actionsCol.setCellFactory(col -> new TableCell<>() {
             private final Button editBtn = new Button("Edit");
-            private final HBox box = new HBox(6, editBtn);
+            private final Button barcodeBtn = new Button("Barcode");
+            private final HBox box = new HBox(6, editBtn, barcodeBtn);
             {
                 editBtn.getStyleClass().add("btn-secondary");
+                barcodeBtn.getStyleClass().add("btn-secondary");
                 editBtn.setOnAction(e -> {
                     ProductService.ProductStockRow row = getTableView().getItems().get(getIndex());
                     openEditDialog(row.product);
+                });
+                barcodeBtn.setOnAction(e -> {
+                    ProductService.ProductStockRow row = getTableView().getItems().get(getIndex());
+                    openBarcodeDialog(row.product);
                 });
             }
             @Override
@@ -135,6 +141,28 @@ public class ProductController {
         } catch (Exception e) {
             log.error("Failed to open product edit dialog", e);
             new Alert(Alert.AlertType.ERROR, "Could not open the product form.").showAndWait();
+        }
+    }
+
+    private void openBarcodeDialog(Product product) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/barcode_preview.fxml"));
+            Parent root = loader.load();
+            BarcodePreviewController controller = loader.getController();
+            controller.configure(product);
+
+            Stage dialog = new Stage();
+            dialog.setTitle("Barcode — " + product.getProductName());
+            dialog.initModality(Modality.APPLICATION_MODAL);
+            Scene scene = new Scene(root, 420, 420);
+            var css = getClass().getResource("/css/theme.css");
+            if (css != null) scene.getStylesheets().add(css.toExternalForm());
+            dialog.setScene(scene);
+            scene.setOnKeyPressed(ke -> { if (ke.getCode() == javafx.scene.input.KeyCode.ESCAPE) dialog.close(); });
+            dialog.showAndWait();
+        } catch (Exception e) {
+            log.error("Failed to open barcode dialog", e);
+            new Alert(Alert.AlertType.ERROR, "Could not open the barcode preview.").showAndWait();
         }
     }
 
