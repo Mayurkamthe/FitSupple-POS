@@ -51,20 +51,32 @@ public class SaleService {
         return SessionManager.withTransaction(session -> {
             GstSetting gstSetting = session.get(GstSetting.class, 1L);
             BillingMode billingMode = gstSetting != null ? gstSetting.getBillingMode() : BillingMode.NON_GST;
-            // The shop's registered state is not captured per-customer in this build, so intra-state
-            // (CGST+SGST) is assumed for every GST sale. Switch to IGST here once customer state
-            // capture is added — see Settings/GST module notes.
-            TaxType taxType = billingMode == BillingMode.GST ? TaxType.INTRA_STATE : null;
+
+            Customer customer = null;
+            if (customerId != null) {
+                customer = session.get(Customer.class, customerId);
+            }
+
+            // Inter-state (IGST) applies when the customer's registered state code differs from
+            // the shop's own state code (captured in GST Settings). If either side hasn't recorded
+            // a state code — e.g. walk-in customers, or the shop hasn't set one up yet — we fall
+            // back to intra-state (CGST+SGST), which matches the previous always-intra-state
+            // behaviour and is the safer default for a same-city retail shop.
+            TaxType taxType = null;
+            if (billingMode == BillingMode.GST) {
+                String shopState = gstSetting != null ? gstSetting.getStateCode() : null;
+                String customerState = customer != null ? customer.getStateCode() : null;
+                boolean interState = shopState != null && !shopState.isBlank()
+                        && customerState != null && !customerState.isBlank()
+                        && !shopState.trim().equalsIgnoreCase(customerState.trim());
+                taxType = interState ? TaxType.INTER_STATE : TaxType.INTRA_STATE;
+            }
 
             Sale sale = new Sale();
             sale.setBillingMode(billingMode);
             sale.setTaxType(taxType);
             sale.setInvoiceNumber(invoiceSettingDao.nextInvoiceNumber(session));
-
-            if (customerId != null) {
-                Customer customer = session.get(Customer.class, customerId);
-                sale.setCustomer(customer);
-            }
+            sale.setCustomer(customer);
 
             BigDecimal subtotal = BigDecimal.ZERO;
             BigDecimal totalDiscount = BigDecimal.ZERO;
@@ -188,6 +200,8 @@ public class SaleService {
             }
 
             session.persist(sale);
+            com.fitsupplepos.util.AuditLogger.log(session, "SALE_CREATED", "Sale", sale.getInvoiceNumber(),
+                    "Grand total ₹" + roundedTotal + ", " + sale.getItems().size() + " item(s), payment status " + sale.getPaymentStatus());
             log.info("Recorded sale {} — {} item line(s), grand total {}", sale.getInvoiceNumber(), sale.getItems().size(), roundedTotal);
             return sale;
         });

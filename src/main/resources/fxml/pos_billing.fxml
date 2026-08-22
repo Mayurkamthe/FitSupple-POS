@@ -41,8 +41,12 @@
             <Label text="Customer (F3)" minWidth="160"/>
             <ComboBox fx:id="customerCombo" editable="true" prefWidth="260"/>
             <Button text="Walk-in / Clear" styleClass="btn-secondary" onAction="#handleClearCustomer"/>
+            <Label text="Coupon Code"/>
+            <TextField fx:id="couponField" prefWidth="140" promptText="e.g. SAVE10"/>
+            <Button text="Apply Coupon" styleClass="btn-secondary" onAction="#handleApplyCoupon"/>
         </HBox>
 
+        <Label fx:id="offersAppliedLabel" styleClass="hint-text" wrapText="true" managed="false" visible="false"/>
         <Label fx:id="errorLabel" styleClass="error-text" wrapText="true" managed="false" visible="false"/>
     </VBox>
 
@@ -73,6 +77,7 @@
         <VBox spacing="6" GridPane.columnIndex="1" alignment="CENTER_RIGHT">
             <Label fx:id="subtotalLabel" text="Subtotal: ₹0.00"/>
             <Label fx:id="discountTotalLabel" text="Discount: ₹0.00"/>
+            <Label fx:id="couponDiscountLabel" text="Coupon Discount: ₹0.00" managed="false" visible="false"/>
             <Label fx:id="taxableLabel" text="Taxable Amount: ₹0.00"/>
             <Label fx:id="gstLabel" text="GST (CGST+SGST): ₹0.00"/>
             <Label fx:id="grandTotalLabel" text="Grand Total: ₹0.00" styleClass="card-value"/>

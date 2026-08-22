@@ -34,6 +34,9 @@
     <Label text="Address"/>
     <TextArea fx:id="addressField" prefRowCount="2"/>
 
+    <Label text="State Code (GST, e.g. 27 for Maharashtra)"/>
+    <TextField fx:id="stateCodeField" promptText="Leave blank if unregistered / same state as shop"/>
+
     <Label text="Notes"/>
     <TextArea fx:id="notesField" prefRowCount="2"/>
 

@@ -73,6 +73,8 @@ public class ReturnService {
                         saleItem.getSale().getInvoiceNumber(), "Returned as " + reason + " — written off, not restocked");
             }
 
+            com.fitsupplepos.util.AuditLogger.log(session, "SALES_RETURN", "SalesReturn", saleItem.getSale().getInvoiceNumber(),
+                    returnQuantity + " unit(s) of " + saleItem.getProduct().getProductName() + ", reason " + reason + ", refund ₹" + refundAmount);
             log.info("Processed sales return of {} unit(s) for sale item {} (reason: {})", returnQuantity, saleItemId, reason);
             return salesReturn;
         });
@@ -113,6 +115,8 @@ public class ReturnService {
                     TransactionType.PURCHASE_RETURN, purchaseItem.getPurchase().getInvoiceNumber(),
                     "Purchase return: " + reason);
 
+            com.fitsupplepos.util.AuditLogger.log(session, "PURCHASE_RETURN", "PurchaseReturn", purchaseItem.getPurchase().getInvoiceNumber(),
+                    returnQuantity + " unit(s) of " + purchaseItem.getProduct().getProductName() + ", reason " + reason + ", refund ₹" + refundAmount);
             log.info("Processed purchase return of {} unit(s) for purchase item {}", returnQuantity, purchaseItemId);
             return purchaseReturn;
         });

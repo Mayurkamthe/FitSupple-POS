@@ -108,6 +108,8 @@ public class PurchaseService {
             purchase.setGrandTotal(grandTotal);
 
             session.persist(purchase);
+            com.fitsupplepos.util.AuditLogger.log(session, "PURCHASE_CREATED", "Purchase", purchase.getInvoiceNumber(),
+                    "From " + supplier.getName() + ", grand total ₹" + grandTotal + ", " + items.size() + " item(s)");
             log.info("Recorded purchase {} from supplier {} — {} line item(s), total {}",
                     purchase.getInvoiceNumber(), supplier.getName(), items.size(), grandTotal);
             return purchase;

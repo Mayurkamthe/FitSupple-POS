@@ -35,6 +35,9 @@ public class GstSettingService {
             setting.setStateCode(stateCode);
             setting.setDefaultGstRate(defaultGstRate == null ? BigDecimal.ZERO : defaultGstRate);
             session.merge(setting);
+            com.fitsupplepos.util.AuditLogger.log(session, "SETTINGS_CHANGED", "GstSetting", "1",
+                    "Billing mode set to " + billingMode + (gstin != null && !gstin.isBlank() ? ", GSTIN " + gstin : "")
+                            + (stateCode != null && !stateCode.isBlank() ? ", state code " + stateCode : ""));
             return setting;
         });
     }

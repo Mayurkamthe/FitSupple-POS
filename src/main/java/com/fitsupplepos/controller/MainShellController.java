@@ -69,6 +69,46 @@ public class MainShellController {
 
         navigateTo("Dashboard");
         startConnectivityMonitor();
+
+        sidebarBox.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                startIdleTimeoutMonitor(newScene);
+            }
+        });
+    }
+
+    /**
+     * Auto-logout: any mouse or key activity anywhere in the window resets a countdown
+     * of {@code session.timeoutMinutes} (from AppConfig, default 15). If it ever
+     * elapses with no activity, the owner is logged out and returned to the login
+     * screen — same behaviour as a manual "Logout" click.
+     */
+    private void startIdleTimeoutMonitor(javafx.scene.Scene scene) {
+        int timeoutMinutes = com.fitsupplepos.config.AppConfig.sessionTimeoutMinutes();
+        if (timeoutMinutes <= 0) return;
+
+        Timeline idleTimer = new Timeline(new KeyFrame(Duration.minutes(timeoutMinutes), e -> {
+            log.info("Session idle for {} minute(s) — auto-logging out.", timeoutMinutes);
+            authService.logout();
+            try {
+                Parent root = SceneManager.load("/fxml/login.fxml");
+                SceneManager.showScene(root, "/css/theme.css", "FitSupple POS — Owner Login", false);
+                Alert alert = new Alert(Alert.AlertType.INFORMATION,
+                        "You were logged out after " + timeoutMinutes + " minute(s) of inactivity.");
+                alert.showAndWait();
+            } catch (IOException ex) {
+                log.error("Failed to return to login screen after idle timeout", ex);
+            }
+        }));
+        idleTimer.setCycleCount(1);
+        idleTimer.play();
+
+        javafx.event.EventHandler<javafx.scene.input.InputEvent> resetOnActivity = e -> {
+            idleTimer.stop();
+            idleTimer.playFromStart();
+        };
+        scene.addEventFilter(javafx.scene.input.MouseEvent.ANY, resetOnActivity);
+        scene.addEventFilter(javafx.scene.input.KeyEvent.ANY, resetOnActivity);
     }
 
     private void buildSidebar() {

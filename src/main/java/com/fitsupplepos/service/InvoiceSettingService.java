@@ -37,6 +37,8 @@ public class InvoiceSettingService {
             setting.setPurchasePrefix(purchasePrefix == null || purchasePrefix.isBlank() ? "PUR" : purchasePrefix.trim());
             setting.setInvoiceFooterNote(footerNote);
             session.merge(setting);
+            com.fitsupplepos.util.AuditLogger.log(session, "SETTINGS_CHANGED", "InvoiceSetting", "1",
+                    "Shop details / invoice settings updated for \"" + setting.getShopName() + "\"");
             return setting;
         });
     }

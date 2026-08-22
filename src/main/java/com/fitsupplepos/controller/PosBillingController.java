@@ -3,6 +3,7 @@ package com.fitsupplepos.controller;
 import com.fitsupplepos.exception.BusinessException;
 import com.fitsupplepos.model.Customer;
 import com.fitsupplepos.model.GstSetting;
+import com.fitsupplepos.model.Offer;
 import com.fitsupplepos.model.Product;
 import com.fitsupplepos.model.Sale;
 import com.fitsupplepos.model.enums.BillingMode;
@@ -45,6 +46,8 @@ public class PosBillingController {
     @FXML private Label errorLabel;
 
     @FXML private ComboBox<Customer> customerCombo;
+    @FXML private TextField couponField;
+    @FXML private Label offersAppliedLabel;
 
     @FXML private TableView<CartRow> cartTable;
     @FXML private TableColumn<CartRow, String> cartProductCol;
@@ -59,6 +62,7 @@ public class PosBillingController {
 
     @FXML private Label subtotalLabel;
     @FXML private Label discountTotalLabel;
+    @FXML private Label couponDiscountLabel;
     @FXML private Label taxableLabel;
     @FXML private Label gstLabel;
     @FXML private Label grandTotalLabel;
@@ -69,14 +73,23 @@ public class PosBillingController {
     private final com.fitsupplepos.service.InvoiceService invoiceService = new com.fitsupplepos.service.InvoiceService();
 
     private final ObservableList<CartRow> cart = FXCollections.observableArrayList();
+    private final com.fitsupplepos.service.OfferService offerService = new com.fitsupplepos.service.OfferService();
     private BillingMode billingMode = BillingMode.NON_GST;
+    private GstSetting gstSetting;
     private Sale lastSavedSale;
+    private List<Offer> validOffers = new ArrayList<>();
+    private Offer appliedCoupon;
+    private BigDecimal couponDiscountTotal = BigDecimal.ZERO;
 
     /** Simple client-side estimate row; authoritative GST/FEFO math happens server-side in SaleService. */
     public static class CartRow {
         Product product;
         int quantity;
         BigDecimal discount;
+        /** Discount contributed by an auto-applied Offer (percentage/fixed/customer-specific), on top of {@link #discount}. */
+        BigDecimal offerDiscount = BigDecimal.ZERO;
+        /** True for a "Get Y" line auto-added by a Buy-X-Get-Y offer — recomputed on every cart change, never manually edited. */
+        boolean freebie = false;
 
         CartRow(Product product, int quantity, BigDecimal discount) {
             this.product = product;
@@ -84,9 +97,13 @@ public class PosBillingController {
             this.discount = discount;
         }
 
+        BigDecimal totalDiscount() {
+            return discount.add(offerDiscount);
+        }
+
         BigDecimal lineTotal(BigDecimal gstRateOverride) {
             BigDecimal gross = product.getSellingPrice().multiply(BigDecimal.valueOf(quantity));
-            BigDecimal taxable = gross.subtract(discount);
+            BigDecimal taxable = gross.subtract(totalDiscount()).max(BigDecimal.ZERO);
             BigDecimal gst = taxable.multiply(gstRateOverride).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
             return taxable.add(gst);
         }
@@ -94,7 +111,7 @@ public class PosBillingController {
 
     @FXML
     public void initialize() {
-        GstSetting gstSetting = SessionManager.withSession(session -> session.get(GstSetting.class, 1L));
+        gstSetting = SessionManager.withSession(session -> session.get(GstSetting.class, 1L));
         billingMode = gstSetting != null ? gstSetting.getBillingMode() : BillingMode.NON_GST;
         billingModeLabel.setText(billingMode == BillingMode.GST ? "GST BILLING" : "NON-GST BILLING");
 
@@ -109,6 +126,9 @@ public class PosBillingController {
             @Override public String toString(Customer c) { return c == null ? "Walk-in Customer" : c.getName() + " (" + c.getMobile() + ")"; }
             @Override public Customer fromString(String s) { return null; }
         });
+        customerCombo.valueProperty().addListener((obs, oldC, newC) -> { applyAutoOffers(); recalcTotals(); });
+
+        validOffers = offerService.listCurrentlyValid();
 
         paymentMethodCombo.setItems(FXCollections.observableArrayList(PaymentMethod.values()));
         paymentMethodCombo.setValue(PaymentMethod.CASH);
@@ -137,7 +157,9 @@ public class PosBillingController {
         cartProductCol.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().product.getProductName()));
         cartRateCol.setCellValueFactory(c -> new SimpleStringProperty("₹" + c.getValue().product.getSellingPrice()));
         cartQtyCol.setCellValueFactory(c -> new SimpleStringProperty(String.valueOf(c.getValue().quantity)));
-        cartDiscountCol.setCellValueFactory(c -> new SimpleStringProperty("₹" + c.getValue().discount));
+        cartDiscountCol.setCellValueFactory(c -> new SimpleStringProperty(
+                "₹" + c.getValue().totalDiscount().setScale(2, RoundingMode.HALF_UP)
+                        + (c.getValue().freebie ? " (offer)" : c.getValue().offerDiscount.signum() > 0 ? " (incl. offer)" : "")));
         cartTotalCol.setCellValueFactory(c -> new SimpleStringProperty("₹" + c.getValue().lineTotal(effectiveGstRate(c.getValue())).setScale(2, RoundingMode.HALF_UP)));
 
         cartRemoveCol.setCellFactory(col -> new TableCell<>() {
@@ -147,6 +169,7 @@ public class PosBillingController {
                 removeBtn.getStyleClass().add("btn-secondary");
                 removeBtn.setOnAction(e -> {
                     cart.remove(getTableView().getItems().get(getIndex()));
+                    applyAutoOffers();
                     recalcTotals();
                 });
             }
@@ -158,6 +181,21 @@ public class PosBillingController {
         });
 
         cartTable.setItems(cart);
+    }
+
+    /** Mirrors SaleService's tax-type decision so the on-screen estimate matches what gets saved. */
+    private boolean isInterStateForSelectedCustomer() {
+        if (gstSetting == null) return false;
+        String shopState = gstSetting.getStateCode();
+        Customer customer = customerCombo.getValue();
+        String customerState = customer != null ? customer.getStateCode() : null;
+        return shopState != null && !shopState.isBlank()
+                && customerState != null && !customerState.isBlank()
+                && !shopState.trim().equalsIgnoreCase(customerState.trim());
+    }
+
+    private String gstBreakdownLabel() {
+        return isInterStateForSelectedCustomer() ? "IGST" : "CGST+SGST";
     }
 
     private BigDecimal effectiveGstRate(CartRow row) {
@@ -204,14 +242,83 @@ public class PosBillingController {
 
     private void addProductToCart(Product product, int qty, BigDecimal discount) {
         for (CartRow row : cart) {
-            if (row.product.getId().equals(product.getId())) {
+            if (!row.freebie && row.product.getId().equals(product.getId())) {
                 row.quantity += qty;
-                cartTable.refresh();
+                applyAutoOffers();
                 recalcTotals();
                 return;
             }
         }
         cart.add(new CartRow(product, qty, discount));
+        applyAutoOffers();
+        recalcTotals();
+    }
+
+    /**
+     * Re-evaluates every currently-valid Offer against the cart: applies the best
+     * percentage/fixed/customer-specific discount to each real line, and (re)generates
+     * "free" lines for any Buy-X-Get-Y offer the cart now qualifies for. Called after
+     * every cart or customer change so the bill always reflects what's actually in the
+     * cart right now — never a stale offer from a previous state.
+     */
+    private void applyAutoOffers() {
+        cart.removeIf(row -> row.freebie);
+
+        Customer customer = customerCombo.getValue();
+        List<String> appliedNames = new ArrayList<>();
+
+        for (CartRow row : cart) {
+            BigDecimal gross = row.product.getSellingPrice().multiply(BigDecimal.valueOf(row.quantity));
+            var best = offerService.findBestAutoDiscount(validOffers, row.product, customer, gross);
+            if (best.isPresent()) {
+                row.offerDiscount = offerService.discountAmountFor(best.get(), gross);
+                if (row.offerDiscount.signum() > 0) appliedNames.add(best.get().getName());
+            } else {
+                row.offerDiscount = BigDecimal.ZERO;
+            }
+        }
+
+        List<CartRow> baseRows = new ArrayList<>(cart);
+        for (CartRow row : baseRows) {
+            for (Offer offer : offerService.findBuyXGetYOffersFor(validOffers, row.product)) {
+                int buyQty = offer.getBuyQuantity();
+                if (buyQty <= 0 || row.quantity < buyQty) continue;
+                int multiples = row.quantity / buyQty;
+                int freeQty = multiples * offer.getGetQuantity();
+                if (freeQty <= 0 || offer.getGetProduct() == null) continue;
+
+                CartRow freebie = new CartRow(offer.getGetProduct(), freeQty, BigDecimal.ZERO);
+                freebie.freebie = true;
+                freebie.offerDiscount = offer.getGetProduct().getSellingPrice().multiply(BigDecimal.valueOf(freeQty));
+                cart.add(freebie);
+                appliedNames.add(offer.getName());
+            }
+        }
+
+        if (appliedNames.isEmpty()) {
+            offersAppliedLabel.setVisible(false);
+            offersAppliedLabel.setManaged(false);
+        } else {
+            offersAppliedLabel.setText("Offers applied: " + String.join(", ", appliedNames.stream().distinct().toList()));
+            offersAppliedLabel.setVisible(true);
+            offersAppliedLabel.setManaged(true);
+        }
+        cartTable.refresh();
+    }
+
+    @FXML
+    private void handleApplyCoupon() {
+        String code = couponField.getText();
+        var offer = offerService.findCouponOffer(validOffers, code);
+        if (offer.isEmpty()) {
+            appliedCoupon = null;
+            couponDiscountTotal = BigDecimal.ZERO;
+            showError("No active offer found for coupon \"" + (code == null ? "" : code.trim()) + "\".");
+            recalcTotals();
+            return;
+        }
+        appliedCoupon = offer.get();
+        hideError();
         recalcTotals();
     }
 
@@ -223,20 +330,35 @@ public class PosBillingController {
         for (CartRow row : cart) {
             BigDecimal gross = row.product.getSellingPrice().multiply(BigDecimal.valueOf(row.quantity));
             subtotal = subtotal.add(gross);
-            discountTotal = discountTotal.add(row.discount);
-            BigDecimal taxable = gross.subtract(row.discount);
+            discountTotal = discountTotal.add(row.totalDiscount());
+            BigDecimal taxable = gross.subtract(row.totalDiscount()).max(BigDecimal.ZERO);
             BigDecimal gst = taxable.multiply(effectiveGstRate(row)).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
             gstTotal = gstTotal.add(gst);
         }
 
-        BigDecimal taxable = subtotal.subtract(discountTotal);
+        BigDecimal taxableBeforeCoupon = subtotal.subtract(discountTotal).max(BigDecimal.ZERO);
+
+        couponDiscountTotal = BigDecimal.ZERO;
+        if (appliedCoupon != null) {
+            couponDiscountTotal = offerService.discountAmountFor(appliedCoupon, taxableBeforeCoupon);
+        }
+
+        BigDecimal taxable = taxableBeforeCoupon.subtract(couponDiscountTotal).max(BigDecimal.ZERO);
         BigDecimal rawTotal = taxable.add(gstTotal);
         BigDecimal grandTotal = rawTotal.setScale(0, RoundingMode.HALF_UP);
 
         subtotalLabel.setText("Subtotal: ₹" + subtotal.setScale(2, RoundingMode.HALF_UP));
         discountTotalLabel.setText("Discount: ₹" + discountTotal.setScale(2, RoundingMode.HALF_UP));
+        if (couponDiscountTotal.signum() > 0) {
+            couponDiscountLabel.setText("Coupon Discount (" + appliedCoupon.getCouponCode() + "): ₹" + couponDiscountTotal.setScale(2, RoundingMode.HALF_UP));
+            couponDiscountLabel.setVisible(true);
+            couponDiscountLabel.setManaged(true);
+        } else {
+            couponDiscountLabel.setVisible(false);
+            couponDiscountLabel.setManaged(false);
+        }
         taxableLabel.setText("Taxable Amount: ₹" + taxable.setScale(2, RoundingMode.HALF_UP));
-        gstLabel.setText("GST (CGST+SGST): ₹" + gstTotal.setScale(2, RoundingMode.HALF_UP));
+        gstLabel.setText("GST (" + gstBreakdownLabel() + "): ₹" + gstTotal.setScale(2, RoundingMode.HALF_UP));
         grandTotalLabel.setText("Grand Total: ₹" + grandTotal);
         amountPaidField.setText(grandTotal.toPlainString());
     }
@@ -250,6 +372,10 @@ public class PosBillingController {
     private void handleNewBill() {
         cart.clear();
         customerCombo.setValue(null);
+        couponField.clear();
+        appliedCoupon = null;
+        couponDiscountTotal = BigDecimal.ZERO;
+        validOffers = offerService.listCurrentlyValid();
         amountPaidField.clear();
         recalcTotals();
         hideError();
@@ -269,12 +395,39 @@ public class PosBillingController {
             BigDecimal amountPaid = amountPaidField.getText() == null || amountPaidField.getText().isBlank()
                     ? BigDecimal.ZERO : new BigDecimal(amountPaidField.getText().trim());
 
-            List<SaleService.CartLineInput> lines = new ArrayList<>();
+            // Distribute the coupon discount (a whole-cart amount) proportionally across lines
+            // by their pre-coupon taxable value, since SaleService/Sale only model per-line
+            // discounts — there's no separate "cart-level discount" column on Sale.
+            BigDecimal taxableBeforeCoupon = BigDecimal.ZERO;
             for (CartRow row : cart) {
+                BigDecimal gross = row.product.getSellingPrice().multiply(BigDecimal.valueOf(row.quantity));
+                taxableBeforeCoupon = taxableBeforeCoupon.add(gross.subtract(row.totalDiscount()).max(BigDecimal.ZERO));
+            }
+
+            List<SaleService.CartLineInput> lines = new ArrayList<>();
+            BigDecimal couponAllocated = BigDecimal.ZERO;
+            int rowIndex = 0;
+            for (CartRow row : cart) {
+                rowIndex++;
+                BigDecimal gross = row.product.getSellingPrice().multiply(BigDecimal.valueOf(row.quantity));
+                BigDecimal lineTaxable = gross.subtract(row.totalDiscount()).max(BigDecimal.ZERO);
+
+                BigDecimal couponShare = BigDecimal.ZERO;
+                if (couponDiscountTotal.signum() > 0 && taxableBeforeCoupon.signum() > 0) {
+                    if (rowIndex == cart.size()) {
+                        // last row absorbs any rounding remainder so the allocated total matches exactly
+                        couponShare = couponDiscountTotal.subtract(couponAllocated);
+                    } else {
+                        couponShare = couponDiscountTotal.multiply(lineTaxable)
+                                .divide(taxableBeforeCoupon, 2, RoundingMode.HALF_UP);
+                        couponAllocated = couponAllocated.add(couponShare);
+                    }
+                }
+
                 SaleService.CartLineInput line = new SaleService.CartLineInput();
                 line.productId = row.product.getId();
                 line.quantity = row.quantity;
-                line.discountAmount = row.discount;
+                line.discountAmount = row.totalDiscount().add(couponShare);
                 lines.add(line);
             }
 

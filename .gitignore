@@ -1,7 +1,7 @@
 target/
-data/
-logs/
-config/
+/data/
+/logs/
+/config/
 *.class
 .idea/
 *.iml

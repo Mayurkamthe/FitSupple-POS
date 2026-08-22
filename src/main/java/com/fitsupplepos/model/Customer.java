@@ -29,6 +29,10 @@ public class Customer {
     @Column(length = 300)
     private String address;
 
+    /** 2-digit GST state code (e.g. "27" for Maharashtra) used to decide CGST+SGST vs IGST at billing time. */
+    @Column(name = "state_code", length = 5)
+    private String stateCode;
+
     @Column
     private LocalDate birthday;
 
@@ -53,6 +57,8 @@ public class Customer {
     public void setEmail(String email) { this.email = email; }
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
+    public String getStateCode() { return stateCode; }
+    public void setStateCode(String stateCode) { this.stateCode = stateCode; }
     public LocalDate getBirthday() { return birthday; }
     public void setBirthday(LocalDate birthday) { this.birthday = birthday; }
     public String getNotes() { return notes; }

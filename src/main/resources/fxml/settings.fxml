@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -69,12 +71,29 @@
     <VBox styleClass="card" spacing="8">
         <Label text="Security" styleClass="card-title"/>
         <Label text="Owner password can be changed from the header menu (top-right of the app) at any time." styleClass="placeholder-text" wrapText="true"/>
+        <Label text="Auto-logout after (minutes of inactivity)"/>
+        <TextField fx:id="sessionTimeoutField" maxWidth="120"/>
     </VBox>
 
-    <VBox styleClass="card" spacing="8">
+    <VBox styleClass="card" spacing="10">
         <Label text="WhatsApp Cloud API Configuration" styleClass="card-title"/>
-        <Label text="WhatsApp access tokens and phone number IDs are never stored in the app database or source code. Edit them directly in the external config file below, then restart the app." styleClass="placeholder-text" wrapText="true"/>
+        <Label text="Stored only in the external config file below — never in the app database or in source control." styleClass="placeholder-text" wrapText="true"/>
         <Label fx:id="configPathLabel" styleClass="placeholder-text" wrapText="true"/>
+
+        <CheckBox fx:id="whatsAppEnabledCheckBox" text="Enable WhatsApp sending"/>
+
+        <Label text="Access Token"/>
+        <PasswordField fx:id="whatsAppTokenField"/>
+
+        <Label text="Phone Number ID"/>
+        <TextField fx:id="whatsAppPhoneNumberIdField"/>
+
+        <Label text="WhatsApp Business Account ID (for campaigns, optional)"/>
+        <TextField fx:id="whatsAppBusinessAccountIdField"/>
+
+        <HBox alignment="CENTER_RIGHT">
+            <Button text="Save WhatsApp Settings" styleClass="btn-secondary" onAction="#handleSaveWhatsApp"/>
+        </HBox>
     </VBox>
 
     <VBox styleClass="card" spacing="8">

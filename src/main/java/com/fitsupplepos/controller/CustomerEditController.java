@@ -17,6 +17,7 @@ public class CustomerEditController {
     @FXML private TextField emailField;
     @FXML private DatePicker birthdayPicker;
     @FXML private TextArea addressField;
+    @FXML private TextField stateCodeField;
     @FXML private TextArea notesField;
     @FXML private CheckBox whatsappOptInCheckBox;
     @FXML private Label errorLabel;
@@ -42,6 +43,7 @@ public class CustomerEditController {
         emailField.setText(customer.getEmail());
         birthdayPicker.setValue(customer.getBirthday());
         addressField.setText(customer.getAddress());
+        stateCodeField.setText(customer.getStateCode());
         notesField.setText(customer.getNotes());
         whatsappOptInCheckBox.setSelected(customer.isWhatsappOptIn());
     }
@@ -57,6 +59,8 @@ public class CustomerEditController {
             customer.setEmail(text(emailField));
             customer.setBirthday(birthdayPicker.getValue());
             customer.setAddress(addressField.getText());
+            customer.setStateCode(stateCodeField.getText() == null || stateCodeField.getText().isBlank()
+                    ? null : stateCodeField.getText().trim());
             customer.setNotes(notesField.getText());
             customer.setWhatsappOptIn(whatsappOptInCheckBox.isSelected());
 
