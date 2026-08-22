@@ -81,6 +81,7 @@
 
     <HBox spacing="10" alignment="CENTER_RIGHT">
         <Button text="F6 Print" styleClass="btn-secondary" onAction="#handlePrint"/>
+        <Button text="Save PDF" styleClass="btn-secondary" onAction="#handleSavePdf"/>
         <Button text="F7 WhatsApp Invoice" styleClass="btn-secondary" onAction="#handleWhatsApp"/>
         <Button text="F5 Save Bill" styleClass="btn-accent" onAction="#handleSaveBill"/>
     </HBox>

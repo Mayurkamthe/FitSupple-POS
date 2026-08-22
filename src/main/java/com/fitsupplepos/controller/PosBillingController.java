@@ -1,6 +1,5 @@
 package com.fitsupplepos.controller;
 
-import com.fitsupplepos.dao.InvoiceSettingDao;
 import com.fitsupplepos.exception.BusinessException;
 import com.fitsupplepos.model.Customer;
 import com.fitsupplepos.model.GstSetting;
@@ -25,6 +24,9 @@ import javafx.scene.layout.HBox;
 import javafx.util.StringConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -64,10 +66,11 @@ public class PosBillingController {
     private final ProductService productService = new ProductService();
     private final CustomerService customerService = new CustomerService();
     private final SaleService saleService = new SaleService();
-    private final InvoiceSettingDao invoiceSettingDao = new InvoiceSettingDao();
+    private final com.fitsupplepos.service.InvoiceService invoiceService = new com.fitsupplepos.service.InvoiceService();
 
     private final ObservableList<CartRow> cart = FXCollections.observableArrayList();
     private BillingMode billingMode = BillingMode.NON_GST;
+    private Sale lastSavedSale;
 
     /** Simple client-side estimate row; authoritative GST/FEFO math happens server-side in SaleService. */
     public static class CartRow {
@@ -277,10 +280,11 @@ public class PosBillingController {
 
             Customer customer = customerCombo.getValue();
             Sale sale = saleService.recordSale(customer == null ? null : customer.getId(), lines, method, amountPaid);
+            lastSavedSale = sale;
 
             Alert alert = new Alert(Alert.AlertType.INFORMATION,
                     "Bill saved as invoice " + sale.getInvoiceNumber() + ".\nGrand Total: ₹" + sale.getGrandTotal()
-                            + "\n\n(PDF invoice generation and printing are part of the Invoice module — coming next.)");
+                            + "\n\nUse \"Save PDF\" or \"F6 Print\" to generate the invoice document.");
             alert.showAndWait();
 
             handleNewBill();
@@ -296,7 +300,54 @@ public class PosBillingController {
 
     @FXML
     private void handlePrint() {
-        info("Thermal/A4 printing is part of the Invoice module — coming in the next build phase.");
+        if (lastSavedSale == null) {
+            info("Save a bill first, then Print generates and opens the invoice for printing.");
+            return;
+        }
+        try {
+            File file = invoiceService.generateA4Invoice(lastSavedSale);
+            openWithSystemViewer(file);
+        } catch (IOException e) {
+            log.error("Failed to generate invoice PDF for printing", e);
+            info("Could not generate the invoice PDF: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleSavePdf() {
+        if (lastSavedSale == null) {
+            info("Save a bill first, then Save PDF will generate the invoice document.");
+            return;
+        }
+        try {
+            File a4 = invoiceService.generateA4Invoice(lastSavedSale);
+            File thermal = invoiceService.generateThermalReceipt(lastSavedSale);
+            info("Invoice saved:\n" + a4.getAbsolutePath() + "\n" + thermal.getAbsolutePath());
+        } catch (IOException e) {
+            log.error("Failed to save invoice PDF", e);
+            info("Could not save the invoice PDF: " + e.getMessage());
+        }
+    }
+
+    private void openWithSystemViewer(File file) {
+        try {
+            if (java.awt.Desktop.isDesktopSupported()) {
+                java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+                if (desktop.isSupported(java.awt.Desktop.Action.PRINT)) {
+                    desktop.print(file);
+                    return;
+                }
+                if (desktop.isSupported(java.awt.Desktop.Action.OPEN)) {
+                    desktop.open(file);
+                    return;
+                }
+            }
+            info("Invoice generated at: " + file.getAbsolutePath()
+                    + "\n(Automatic printing is not supported on this system — please open and print it manually.)");
+        } catch (Exception e) {
+            log.error("Failed to open/print invoice file", e);
+            info("Invoice generated at: " + file.getAbsolutePath() + "\nCould not auto-open it: " + e.getMessage());
+        }
     }
 
     @FXML
