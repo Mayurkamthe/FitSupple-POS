@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.fitsupplepos.controller.BackupController"
+      spacing="16">
+
+    <Label text="Backup &amp; Restore" styleClass="placeholder-title"/>
+
+    <VBox styleClass="card" spacing="10">
+        <Label text="A backup is a full snapshot of the local database file. Restoring always creates a fresh safety backup of the current data first." styleClass="placeholder-text" wrapText="true"/>
+        <HBox spacing="10">
+            <Button text="Backup Now" styleClass="btn-primary" onAction="#handleBackupNow"/>
+            <Button text="Restore Selected Backup" styleClass="btn-accent" onAction="#handleRestore"/>
+            <Button text="Export Data (JSON)" styleClass="btn-secondary" onAction="#handleExportData"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Refresh List" styleClass="btn-secondary" onAction="#handleRefresh"/>
+        </HBox>
+        <Label fx:id="statusLabel" styleClass="placeholder-text" wrapText="true"/>
+    </VBox>
+
+    <TableView fx:id="backupTable" VBox.vgrow="ALWAYS" prefHeight="500">
+        <columns>
+            <TableColumn fx:id="fileNameCol" text="Backup File" prefWidth="280"/>
+            <TableColumn fx:id="dateCol" text="Created" prefWidth="180"/>
+            <TableColumn fx:id="sizeCol" text="Size" prefWidth="100"/>
+        </columns>
+    </TableView>
+</VBox>
