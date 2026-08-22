@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.fitsupplepos.controller.ReportController"
+      spacing="14">
+
+    <HBox spacing="12" alignment="CENTER_LEFT">
+        <Label text="Reports" styleClass="placeholder-title"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label text="From"/>
+        <DatePicker fx:id="fromDatePicker"/>
+        <Label text="To"/>
+        <DatePicker fx:id="toDatePicker"/>
+        <Button text="Apply" styleClass="btn-primary" onAction="#handleApply"/>
+    </HBox>
+
+    <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+        <Tab text="Sales">
+            <VBox spacing="10">
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="Group By"/>
+                    <ComboBox fx:id="salesGroupCombo" prefWidth="180"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="totalSalesLabel" styleClass="card-value"/>
+                    <Button text="Export CSV" styleClass="btn-secondary" onAction="#handleExportSales"/>
+                </HBox>
+                <TableView fx:id="salesTable" prefHeight="500"/>
+            </VBox>
+        </Tab>
+
+        <Tab text="Inventory">
+            <VBox spacing="10">
+                <HBox spacing="20" alignment="CENTER_LEFT">
+                    <Label fx:id="stockCostLabel" styleClass="card-value"/>
+                    <Label fx:id="stockMrpLabel" styleClass="card-value"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="Export CSV" styleClass="btn-secondary" onAction="#handleExportInventory"/>
+                </HBox>
+                <Label text="Stock Movement (selected date range)" styleClass="card-title"/>
+                <TableView fx:id="stockMovementTable" prefHeight="460"/>
+            </VBox>
+        </Tab>
+
+        <Tab text="Purchases">
+            <VBox spacing="10">
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="Group By"/>
+                    <ComboBox fx:id="purchaseGroupCombo" prefWidth="180"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="Export CSV" styleClass="btn-secondary" onAction="#handleExportPurchases"/>
+                </HBox>
+                <TableView fx:id="purchaseTable" prefHeight="500"/>
+            </VBox>
+        </Tab>
+
+        <Tab text="GST">
+            <VBox spacing="10">
+                <HBox spacing="24" alignment="CENTER_LEFT">
+                    <Label fx:id="gstTaxableLabel" styleClass="card-value"/>
+                    <Label fx:id="gstCgstLabel" styleClass="card-value"/>
+                    <Label fx:id="gstSgstLabel" styleClass="card-value"/>
+                    <Label fx:id="gstIgstLabel" styleClass="card-value"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="Export CSV" styleClass="btn-secondary" onAction="#handleExportGst"/>
+                </HBox>
+                <Label text="GST by Rate" styleClass="card-title"/>
+                <TableView fx:id="gstByRateTable" prefHeight="460"/>
+            </VBox>
+        </Tab>
+
+        <Tab text="Profit">
+            <VBox spacing="16" styleClass="card">
+                <Label text="Profit &amp; Loss Summary" styleClass="card-title"/>
+                <Label fx:id="revenueLabel"/>
+                <Label fx:id="cogsLabel"/>
+                <Label fx:id="discountsLabel"/>
+                <Label fx:id="expensesLabel"/>
+                <Label fx:id="grossProfitLabel" styleClass="card-value card-value-success"/>
+                <Label fx:id="netProfitLabel" styleClass="card-value card-value-success"/>
+                <HBox alignment="CENTER_RIGHT">
+                    <Button text="Export PDF Summary" styleClass="btn-secondary" onAction="#handleExportProfitPdf"/>
+                </HBox>
+            </VBox>
+        </Tab>
+    </TabPane>
+</VBox>
