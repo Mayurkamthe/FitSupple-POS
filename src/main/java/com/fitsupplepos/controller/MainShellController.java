@@ -57,7 +57,7 @@ public class MainShellController {
         modules.put("Purchase Returns", "/fxml/purchase_returns.fxml");
         modules.put("Expenses", "/fxml/expenses.fxml");
         modules.put("Offers", "/fxml/offers.fxml");
-        modules.put("WhatsApp", null);
+        modules.put("WhatsApp", "/fxml/whatsapp.fxml");
         modules.put("Reports", "/fxml/reports.fxml");
         modules.put("Backup & Restore", "/fxml/backup.fxml");
         modules.put("Settings", "/fxml/settings.fxml");

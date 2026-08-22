@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.fitsupplepos.controller.WhatsAppController"
+      spacing="14">
+
+    <Label text="WhatsApp" styleClass="placeholder-title"/>
+    <Label fx:id="configStatusLabel" styleClass="placeholder-text" wrapText="true"/>
+
+    <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+
+        <Tab text="Send Message">
+            <VBox spacing="14" style="-fx-padding: 16;">
+                <VBox styleClass="card" spacing="10">
+                    <Label text="Send a text or template message to a customer" styleClass="card-title"/>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Customer" minWidth="100"/>
+                        <ComboBox fx:id="sendCustomerCombo" editable="true" prefWidth="260"/>
+                    </HBox>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Template (optional)" minWidth="100"/>
+                        <ComboBox fx:id="sendTemplateCombo" prefWidth="260"/>
+                        <Button text="Clear Template" styleClass="btn-secondary" onAction="#handleClearTemplate"/>
+                    </HBox>
+                    <Label text="Message Text (used when no template is selected)"/>
+                    <TextArea fx:id="sendTextArea" prefRowCount="3"/>
+                    <Label fx:id="sendErrorLabel" styleClass="error-text" wrapText="true" managed="false" visible="false"/>
+                    <HBox alignment="CENTER_RIGHT">
+                        <Button text="Send" styleClass="btn-primary" onAction="#handleSend"/>
+                    </HBox>
+                </VBox>
+
+                <VBox styleClass="card" spacing="8" VBox.vgrow="ALWAYS">
+                    <Label text="Recent Messages" styleClass="card-title"/>
+                    <TableView fx:id="messageTable" VBox.vgrow="ALWAYS" prefHeight="300">
+                        <columns>
+                            <TableColumn fx:id="msgDateCol" text="Sent At" prefWidth="150"/>
+                            <TableColumn fx:id="msgRecipientCol" text="Recipient" prefWidth="140"/>
+                            <TableColumn fx:id="msgTypeCol" text="Type" prefWidth="90"/>
+                            <TableColumn fx:id="msgPurposeCol" text="Purpose" prefWidth="120"/>
+                            <TableColumn fx:id="msgStatusCol" text="Status" prefWidth="90"/>
+                            <TableColumn fx:id="msgErrorCol" text="Error" prefWidth="220"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </VBox>
+        </Tab>
+
+        <Tab text="Templates">
+            <VBox spacing="14" style="-fx-padding: 16;">
+                <HBox alignment="CENTER_RIGHT">
+                    <Button text="+ Add Template" styleClass="btn-primary" onAction="#handleAddTemplate"/>
+                </HBox>
+                <TableView fx:id="templateTable" VBox.vgrow="ALWAYS" prefHeight="450">
+                    <columns>
+                        <TableColumn fx:id="tplNameCol" text="Template Name" prefWidth="200"/>
+                        <TableColumn fx:id="tplLanguageCol" text="Language" prefWidth="80"/>
+                        <TableColumn fx:id="tplCategoryCol" text="Category" prefWidth="120"/>
+                        <TableColumn fx:id="tplBodyCol" text="Body Preview" prefWidth="300"/>
+                        <TableColumn fx:id="tplActionsCol" text="Actions" prefWidth="100"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </Tab>
+
+        <Tab text="Campaigns">
+            <VBox spacing="14" style="-fx-padding: 16;">
+                <VBox styleClass="card" spacing="10">
+                    <Label text="New Campaign" styleClass="card-title"/>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Name" minWidth="90"/>
+                        <TextField fx:id="campaignNameField" prefWidth="220"/>
+                        <Label text="Audience" minWidth="70"/>
+                        <ComboBox fx:id="campaignAudienceCombo" prefWidth="200"/>
+                    </HBox>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Template (optional)" minWidth="90"/>
+                        <ComboBox fx:id="campaignTemplateCombo" prefWidth="220"/>
+                    </HBox>
+                    <Label text="Message Body (used when no template is selected)"/>
+                    <TextArea fx:id="campaignBodyField" prefRowCount="2"/>
+                    <Label fx:id="campaignErrorLabel" styleClass="error-text" wrapText="true" managed="false" visible="false"/>
+                    <HBox alignment="CENTER_RIGHT">
+                        <Button text="Create Campaign" styleClass="btn-primary" onAction="#handleCreateCampaign"/>
+                    </HBox>
+                </VBox>
+
+                <TableView fx:id="campaignTable" VBox.vgrow="ALWAYS" prefHeight="350">
+                    <columns>
+                        <TableColumn fx:id="campNameCol" text="Campaign" prefWidth="160"/>
+                        <TableColumn fx:id="campAudienceCol" text="Audience" prefWidth="140"/>
+                        <TableColumn fx:id="campStatusCol" text="Status" prefWidth="100"/>
+                        <TableColumn fx:id="campRecipientsCol" text="Recipients" prefWidth="90"/>
+                        <TableColumn fx:id="campSentCol" text="Sent" prefWidth="70"/>
+                        <TableColumn fx:id="campFailedCol" text="Failed" prefWidth="70"/>
+                        <TableColumn fx:id="campActionsCol" text="Actions" prefWidth="110"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </Tab>
+    </TabPane>
+</VBox>

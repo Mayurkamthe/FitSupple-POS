@@ -71,6 +71,7 @@ public class PosBillingController {
     private final CustomerService customerService = new CustomerService();
     private final SaleService saleService = new SaleService();
     private final com.fitsupplepos.service.InvoiceService invoiceService = new com.fitsupplepos.service.InvoiceService();
+    private final com.fitsupplepos.service.WhatsAppService whatsAppService = new com.fitsupplepos.service.WhatsAppService();
 
     private final ObservableList<CartRow> cart = FXCollections.observableArrayList();
     private final com.fitsupplepos.service.OfferService offerService = new com.fitsupplepos.service.OfferService();
@@ -505,7 +506,28 @@ public class PosBillingController {
 
     @FXML
     private void handleWhatsApp() {
-        info("WhatsApp invoice sending is part of the WhatsApp module — coming in a later build phase.");
+        if (lastSavedSale == null) {
+            info("Save a bill first, then WhatsApp Invoice will send the customer their PDF.");
+            return;
+        }
+        if (lastSavedSale.getCustomer() == null) {
+            info("This bill has no linked customer. Select a saved customer before billing to enable WhatsApp invoices.");
+            return;
+        }
+        try {
+            File pdf = invoiceService.generateA4Invoice(lastSavedSale);
+            com.fitsupplepos.model.WhatsAppMessage message = whatsAppService.sendInvoicePdf(lastSavedSale, pdf);
+            if (message.getStatus() == com.fitsupplepos.model.enums.WhatsAppMessageStatus.SENT) {
+                info("Invoice sent via WhatsApp to " + message.getRecipientNumber() + ".");
+            } else {
+                info("WhatsApp send failed: " + message.getErrorMessage());
+            }
+        } catch (BusinessException e) {
+            info(e.getMessage());
+        } catch (IOException e) {
+            log.error("Failed to generate invoice PDF for WhatsApp", e);
+            info("Could not generate the invoice PDF: " + e.getMessage());
+        }
     }
 
     private void info(String message) {

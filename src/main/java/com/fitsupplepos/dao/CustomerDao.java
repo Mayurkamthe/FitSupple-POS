@@ -31,4 +31,16 @@ public class CustomerDao extends GenericDao<Customer, Long> {
     public List<Customer> findAllOrderedByName() {
         return query(session -> session.createQuery("from Customer order by name", Customer.class).list());
     }
+
+    /** Customers who have purchased at least one product in the given category — used for WhatsApp audience targeting. */
+    public List<Customer> findByPurchasedCategory(com.fitsupplepos.model.enums.ProductCategory category) {
+        return query(session -> {
+            Query<Customer> q = session.createQuery(
+                    "select distinct si.sale.customer from SaleItem si " +
+                            "where si.product.category = :cat and si.sale.customer is not null",
+                    Customer.class);
+            q.setParameter("cat", category);
+            return q.list();
+        });
+    }
 }
